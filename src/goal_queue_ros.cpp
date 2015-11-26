@@ -57,7 +57,7 @@ int main(int argc, char** argv)
 			goal.target_pose = g_goals[goal_itr];
 			goal.target_pose.header.stamp = ros::Time::now();
 
-			ROS_INFO("Sending Goal nr: %d / %lu", goal_itr, g_goals.size() - 1);
+			ROS_INFO("Sending Goal nr: %d / %lu", goal_itr + 1, g_goals.size());
 			ac.sendGoal(goal);
 			ac.waitForResult();
 
@@ -69,7 +69,7 @@ int main(int argc, char** argv)
 			if(goal_itr++ == g_goals.size())
 				goal_itr = 0;
 
-			ROS_INFO("Moving to goal nr: %d / %lu", goal_itr, g_goals.size() - 1);
+			ROS_INFO("Moving to goal nr: %d / %lu", goal_itr + 1, g_goals.size());
 		}
 		ros::spinOnce();
 		r.sleep();
