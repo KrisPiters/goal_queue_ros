@@ -1,40 +1,6 @@
-/*********************************************************************
-*
-* Software License Agreement (BSD License)
-*
-*  Copyright (c) 2013, Fontys Hogescholen Eindhoven.
-*  All rights reserved.
-*
-*  Redistribution and use in source and binary forms, with or without
-*  modification, are permitted provided that the following conditions
-*  are met:
-*
-*   * Redistributions of source code must retain the above copyright
-*     notice, this list of conditions and the following disclaimer.
-*   * Redistributions in binary form must reproduce the above
-*     copyright notice, this list of conditions and the following
-*     disclaimer in the documentation and/or other materials provided
-*     with the distribution.
-*   * Neither the name of the Fontys Hogescholen Eindhoven nor the names of its
-*     contributors may be used to endorse or promote products derived
-*     from this software without specific prior written permission.
-*
-*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-*  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-*  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-*  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-*  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-*  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-*  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-*  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-*  POSSIBILITY OF SUCH DAMAGE.
-*
-* Author: Kris Piters on 22/11/2013
-*********************************************************************/
-
+/*
+ * Author: Kris Piters on 24/11/2015
+ */
 #include <vector>
 #include <string>
 
@@ -86,7 +52,7 @@ int main(int argc, char** argv)
 			move_base_msgs::MoveBaseGoal goal;
 
 			if(goal_itr >= g_goals.size())
-    		goal_itr = 0;
+				goal_itr = 0;
 
 			goal.target_pose = g_goals[goal_itr];
 			goal.target_pose.header.stamp = ros::Time::now();
@@ -96,20 +62,20 @@ int main(int argc, char** argv)
 			ac.waitForResult();
 
 			if(ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
-    		ROS_INFO("Goal reached succesfully.");
+				ROS_INFO("Goal reached succesfully.");
   		else
-    		ROS_INFO("Reaching the goal has failed.");
+				ROS_INFO("Reaching the goal has failed.");
 
-    	if(goal_itr++ == g_goals.size())
+			if(goal_itr++ == g_goals.size())
     		goal_itr = 0;
 
-    	ROS_INFO("Moving to goal nr: %d / %lu", goal_itr, g_goals.size() - 1);
+			ROS_INFO("Moving to goal nr: %d / %lu", goal_itr, g_goals.size() - 1);
 		}
 		ros::spinOnce();
 		r.sleep();
 	}
 
-	ROS_INFO("Exiting Rosbee Goal Queue...");
+	ROS_INFO("Exiting Goal Queue...");
 
 	return 0;
 }
