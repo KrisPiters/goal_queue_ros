@@ -63,11 +63,11 @@ int main(int argc, char** argv)
 
 			if(ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
 				ROS_INFO("Goal reached succesfully.");
-  		else
+			else
 				ROS_INFO("Reaching the goal has failed.");
 
 			if(goal_itr++ == g_goals.size())
-    		goal_itr = 0;
+				goal_itr = 0;
 
 			ROS_INFO("Moving to goal nr: %d / %lu", goal_itr, g_goals.size() - 1);
 		}
