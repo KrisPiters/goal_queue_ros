@@ -1,0 +1,5 @@
+<launch>
+
+  <node pkg="goal_queue_ros" name="goal_queue_ros_node" type="goal_queue_ros_node"/>
+  
+</launch>

@@ -30,7 +30,7 @@ int main(int argc, char** argv)
 
 	ros::NodeHandle n;
 	
-	ros::Subscriber goals_sub = n.subscribe("/goal_queue_goals", 20, goals_cb);
+	ros::Subscriber goals_sub = n.subscribe("goal_queue_goal", 20, goals_cb);
 	
 	MoveBaseClient ac("move_base", true);
 
