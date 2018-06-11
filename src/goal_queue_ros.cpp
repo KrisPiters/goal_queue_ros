@@ -16,6 +16,9 @@ std::vector<geometry_msgs::PoseStamped> g_goals;
 std::vector<geometry_msgs::Point> g_marker_points;
 ros::Publisher g_goal_marker_pub;
 
+int g_goal_itr;
+bool g_pub_next_goal;
+
 void publish_markers(void)
 {
 	visualization_msgs::Marker line_strip;
@@ -28,6 +31,8 @@ void publish_markers(void)
 	line_strip.color.g = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 	line_strip.color.b = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 	line_strip.color.a = 1.0;
+	line_strip.lifetime.sec = 2.0; 
+	
 	
 	line_strip.points = g_marker_points;
 	line_strip.points.push_back(g_marker_points[0]);
@@ -43,18 +48,57 @@ void goals_cb(const geometry_msgs::PoseStamped::ConstPtr& newGoal)
 	
 	// Add the new goal to the marker and publish
 	geometry_msgs::PoseStamped ps = *newGoal;
+	
+	// TODO tranform pose to fixed frame (default map)
 	g_marker_points.push_back(ps.pose.position);
-	publish_markers();
+	//publish_markers();
+}
+
+// Called once when the goal completes
+void doneCb(const actionlib::SimpleClientGoalState& state,
+            const move_base_msgs::MoveBaseResult::ConstPtr& result)
+{
+  ROS_INFO("Finished in state [%s]", state.toString().c_str());
+  //ROS_INFO("Answer: %i", result->sequence.back());
+  //ros::shutdown();
+
+	if(state == actionlib::SimpleClientGoalState::SUCCEEDED)
+		ROS_INFO("Goal reached succesfully.");
+	else
+		ROS_INFO("Reaching the goal has failed.");
+
+	if(g_goal_itr++ == g_goals.size())
+		g_goal_itr = 0;
+	
+	g_pub_next_goal = true;
+	
+}
+
+// Called once when the goal becomes active
+void activeCb()
+{
+  ROS_INFO("Goal just went active");
+	ROS_INFO("Moving to goal nr: %d / %lu", g_goal_itr + 1, g_goals.size());
+}
+
+// Called every time feedback is received for the goal
+void feedbackCb(const move_base_msgs::MoveBaseFeedback::ConstPtr& feedback)
+{
+  ROS_INFO("Got Feedback");// of length %lu", feedback->base_position.size());
 }
 
 int main(int argc, char** argv)
 {
+	bool ac_online = false;
+	g_pub_next_goal = true;
+	g_goal_itr = 0;
+	
 	ros::init(argc, argv, "goal_queue");
 
 	ROS_INFO("Goal Queue Started.");
 	
-	int goal_itr = 0;
-	bool ac_online = false;
+	
+	
 
 	ros::NodeHandle n;
 	
@@ -79,8 +123,20 @@ int main(int argc, char** argv)
 	{
 		if (g_goals.size() > 0)
 		{
+			if(g_pub_next_goal)
+			{
+				move_base_msgs::MoveBaseGoal goal;
+				goal.target_pose = g_goals[g_goal_itr];
+				goal.target_pose.header.stamp = ros::Time::now();
+				ac.sendGoal(goal, &doneCb, &activeCb, &feedbackCb);
+				//ROS_INFO("Moving to goal nr: %d / %lu", g_goal_itr + 1, g_goals.size());
+				g_pub_next_goal = false;
+			}
+			
+			
+			/*
 			move_base_msgs::MoveBaseGoal goal;
-
+			
 			if(goal_itr >= g_goals.size())
 				goal_itr = 0;
 
@@ -100,6 +156,8 @@ int main(int argc, char** argv)
 				goal_itr = 0;
 
 			ROS_INFO("Moving to goal nr: %d / %lu", goal_itr + 1, g_goals.size());
+			*/
+			publish_markers();
 		}
 		ros::spinOnce();
 		r.sleep();
